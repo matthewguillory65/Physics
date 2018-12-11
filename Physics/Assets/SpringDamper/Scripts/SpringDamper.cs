@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
+[Serializable]
 public class SpringDamper
 {
-    Particle pOne; //Particle One
-    Particle pTwo; //Particle Two
+    public Particle pOne; //Particle One
+    public Particle pTwo; //Particle Two
     float Ks; //Spring Constant
     float Kd; //Damping Factor
     float Lo; //Rest Length
@@ -14,7 +16,7 @@ public class SpringDamper
 
     public SpringDamper(Particle p1, Particle p2)
     {
-        Ks = 50;
+        Ks = 1000;
         Kd = 2;
         Lo = Vector3.Distance(p1.r, p2.r);
         pOne = p1;
@@ -22,47 +24,61 @@ public class SpringDamper
     }
     
 
-    void Update()
+    public void Update()
     {
         //Moving the Particle
         var ePrime = pTwo.r - pOne.r;
         var eMag = ePrime.magnitude;
         var e = ePrime / eMag;
-        e.Normalize();
+        //e.Normalize();
 
         var v1 = Vector3.Dot(e, pOne.v);
         var v2 = Vector3.Dot(e, pTwo.v);
 
-        var Fsd = -Ks * (Lo - L) - Kd * (v1 - v2);
+        var Fsd = (-Ks * (Lo - eMag)) - (Kd * (v1 - v2));
         var F1 = Fsd * e;
         var F2 = -F1;
+        pOne.AddForce(F1);
+        pTwo.AddForce(F2);
+    }
+
+    void OnDrawGizmos()
+    {
+
     }
 }
 
-
+[Serializable]
 public class Particle
 {
-    public readonly Vector3 r; //Position
-    Vector3 rNew; //New Position
+    public Vector3 r; //Position
     public Vector3 v; //Velocity
-    Vector3 vNew; //New Velocity
-    Vector3 a; //Acceleration
-    float m = 1f; //Mass
-    Vector3 f; //Force
-	// Use this for initialization
-	void Start ()
+    public Vector3 a; //Acceleration
+    public float m = 1f; //Mass
+    public Vector3 f; //Force
+    public bool anchor = false;
+	
+    public Particle(Vector3 position)
     {
-        
-	}
+        r = position;
+        a = f * m;
+    }
 	
 	// Update is called once per frame
-	void Update ()
+	public void Update ()
     {
         //Acceleration
         a = f * m;
         //New Velocity
-        vNew = v + (a * Time.deltaTime);
+        v = v + (a * Time.deltaTime);
         //New Position
-        rNew = r + (v * Time.deltaTime);
+        r = r + (v * Time.deltaTime);
+
+        f = Vector3.zero;
+    }
+
+    public void AddForce(Vector3 force)
+    {
+        f += force;
     }
 }
