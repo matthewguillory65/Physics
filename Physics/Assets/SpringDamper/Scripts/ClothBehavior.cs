@@ -7,10 +7,12 @@ using System;
 public class ClothBehavior : MonoBehaviour
 {
     public SpringDamper SD;
+    public AerodynamicForce AF;
     Particle p1, p2;
     Particle particle;
     public List<Particle> particleList = new List<Particle>();
     public List<SpringDamper> springdamper = new List<SpringDamper>();
+    public List<AerodynamicForce> forces = new List<AerodynamicForce>();
     int height = 7;
     int width = 7;
     
@@ -20,15 +22,6 @@ public class ClothBehavior : MonoBehaviour
         p1 = new Particle(new Vector3(0, 0, 0));
         p2 = new Particle(new Vector3(0, 1, 0));
         SD = new SpringDamper(p1, p2);
-
-
-        //for (int width = 0; width < 5; width++)
-        //{
-        //    for (int height = 0; height < 5; height++)
-        //    {
-        //        particleList.Add(new Particle(new Vector3(width, height, 0)));
-        //    }
-        //}
 
         for (int y = 0; y < height; y++)
         {
@@ -65,6 +58,15 @@ public class ClothBehavior : MonoBehaviour
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i - 1 + width]));
             }
         }
+
+        for(int i = 0; i < particleList.Count; i++)
+        {
+            if(particleList[i].r.x < width - 1 && particleList[i].r.y < height - 1)
+            {
+                forces.Add(new AerodynamicForce(particleList[i], particleList[i + 1], particleList[i + width]));
+                forces.Add(new AerodynamicForce(particleList[i + 1], particleList[i + width], particleList[i = width + 1]));
+            }
+        }
     }
 	
 	// Update is called once per frame
@@ -82,17 +84,28 @@ public class ClothBehavior : MonoBehaviour
                 p.Update();
             }
         }
+        foreach(var f in forces)
+        {
+            f.p = new Vector3(5, 0, 0);
+            f.Update();
+        }
     }
 
     void OnDrawGizmos()
     {
-        foreach(var s in springdamper)
+        //foreach(var s in springdamper)
+        //{
+        //    Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
+        //}
+        //foreach(var p in particleList)
+        //{
+        //    Gizmos.DrawSphere(p.r, .12f);
+        //}
+        foreach(var a in forces)
         {
-            Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
-        }
-        foreach(var p in particleList)
-        {
-            Gizmos.DrawSphere(p.r, .12f);
+            Gizmos.DrawLine(a.r1.r, a.r2.r);
+            Gizmos.DrawLine(a.r2.r, a.r3.r);
+            Gizmos.DrawLine(a.r3.r, a.r1.r);
         }
     }
 }

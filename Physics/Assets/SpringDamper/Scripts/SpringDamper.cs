@@ -16,7 +16,7 @@ public class SpringDamper
 
     public SpringDamper(Particle p1, Particle p2)
     {
-        Ks = 1000;
+        Ks = 750;
         Kd = 2;
         Lo = Vector3.Distance(p1.r, p2.r);
         pOne = p1;
