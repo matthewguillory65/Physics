@@ -7,34 +7,36 @@ namespace AABB
 {
     public class CollisionBehavior : MonoBehaviour
     {
-        public Vector2 minXY;
-        public Vector2 maxXY;
-
+        AABBCollider coll;
+        public GameObject box1, box2;
+        public AABBCollider coll1, coll2;
         public bool isColliding = false;
-
-        [NonSerialized]
-        List<CollisionBehavior> XYmin;
-        [NonSerialized]
-        List<CollisionBehavior> XYmax;
+        
 
         private void Start()
         {
-
+            coll1 = box1.GetComponent<AABBCollider>();
+            coll2 = box2.GetComponent<AABBCollider>();
         }
 
-        public void AddToList()
+        public void Update()
         {
-            
-        }
+            if(coll1.min.x < coll2.max.x
+                && coll1.max.x > coll2.min.x
+                && coll1.min.y < coll2.max.y
+                && coll1.max.y > coll2.min.y)
+            {
+                box1.GetComponent<Renderer>().material.color = UnityEngine.Color.blue;
+                box2.GetComponent<Renderer>().material.color = UnityEngine.Color.blue;
+                isColliding = true;
+            }
 
-        public void RemoveFromList()
-        {
-            
-        }
-        
-        public void Collide()
-        {
-
+            else
+            {
+                box1.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
+                box2.GetComponent<Renderer>().material.color = UnityEngine.Color.white;
+                isColliding = false;
+            }
         }
     }
 }

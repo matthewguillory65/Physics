@@ -5,7 +5,6 @@ using UnityEngine;
 public class AerodynamicForce
 {
     public Vector3 p; //Density of the air
-    Vector3 cD; //Coefficient of drag for the object
     Vector3 a; //Cross sectional area of the objbect
     Vector3 e; //Unit vector in the opposite direction of the velocity
     Vector3 v;
@@ -45,7 +44,7 @@ public class AerodynamicForce
 
         //Calculating the aerodynamic force
         var nPrime = particlePos;
-        var totalForce = ((v.magnitude * Vector3.Dot(v, nPrime)) / (2 * nPrime.magnitude)) * nPrime;
+        var totalForce = -.5f * (((v.magnitude * Vector3.Dot(v, nPrime)) / (2 * nPrime.magnitude)) * nPrime);
         r1.AddForce(totalForce);
         r2.AddForce(totalForce);
         r3.AddForce(totalForce);

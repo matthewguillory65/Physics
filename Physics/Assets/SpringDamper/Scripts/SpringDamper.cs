@@ -8,15 +8,15 @@ public class SpringDamper
 {
     public Particle pOne; //Particle One
     public Particle pTwo; //Particle Two
-    float Ks; //Spring Constant
-    float Kd; //Damping Factor
+    public float Ks; //Spring Constant
+    public float Kd; //Damping Factor
     float Lo; //Rest Length
     float L; //Length
     //Properties of a spring damper
 
     public SpringDamper(Particle p1, Particle p2)
     {
-        Ks = 750;
+        Ks = 10;
         Kd = 2;
         Lo = Vector3.Distance(p1.r, p2.r);
         pOne = p1;
