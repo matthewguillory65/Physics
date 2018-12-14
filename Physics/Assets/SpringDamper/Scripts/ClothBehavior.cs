@@ -12,20 +12,18 @@ public class ClothBehavior : MonoBehaviour
     public Slider SpringConstant, SpringDamper, Windx, Windy, Windz;
     Particle p1, p2;
     Particle particle;
-    public GameObject myLine;
     public List<Particle> particleList = new List<Particle>();
     public List<SpringDamper> springdamper = new List<SpringDamper>();
     public List<AerodynamicForce> forces = new List<AerodynamicForce>();
     public List<LineRenderer> line = new List<LineRenderer>();
+    public LineRenderer Line;
     int height = 7;
     int width = 7;
     public Particle GrabbedPart;
 
-
     // Use this for initialization
     void Start()
     {
-        LineRenderer lr = myLine.GetComponent<LineRenderer>();
         p1 = new Particle(new Vector3(0, 0, 0));
         p2 = new Particle(new Vector3(0, 1, 0));
         SD = new SpringDamper(p1, p2);
@@ -54,21 +52,30 @@ public class ClothBehavior : MonoBehaviour
 
         for (int i = 0; i < particleList.Count; i++)
         {
+            
             if (particleList[i].r.x < width - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i + 1]));
+                var l = Instantiate(Line);
+                line.Add(l);
             }
             if (particleList[i].r.y < height - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i + width]));
+                var l = Instantiate(Line);
+                line.Add(l);
             }
             if (particleList[i].r.x < width - 1 && particleList[i].r.y < height - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i + 1 + height]));
+                var l = Instantiate(Line);
+                line.Add(l);
             }
             if (particleList[i].r.x > 0 && particleList[i].r.y != height - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i - 1 + width]));
+                var l = Instantiate(Line);
+                line.Add(l);
             }
         }
 
@@ -79,13 +86,6 @@ public class ClothBehavior : MonoBehaviour
                 forces.Add(new AerodynamicForce(particleList[i], particleList[i + 1], particleList[i + width]));
                 forces.Add(new AerodynamicForce(particleList[i + 1], particleList[i + width], particleList[i + width + 1]));
             }
-        }
-
-        //for every spring, Instantiate a new obj w/ line renderer component
-        foreach(var s in springdamper)
-        {            
-            var l = GameObject.Instantiate(myLine);
-            line.Add(l);
         }
     }
 
@@ -102,7 +102,10 @@ public class ClothBehavior : MonoBehaviour
                 s.Ks = SpringConstant.value;
                 s.Kd = SpringDamper.value;
                 s.Update();
-            }
+                line[springdamper.IndexOf(s)].SetPosition(0, s.pOne.r);
+                line[springdamper.IndexOf(s)].SetPosition(1, s.pTwo.r);
+        }
+
             foreach (var p in particleList)
             {
                 if (!p.anchor)
@@ -111,6 +114,7 @@ public class ClothBehavior : MonoBehaviour
                     p.Update();
                 }
             }
+
             foreach (var f in forces)
             {
                 f.p = new Vector3(5, 0, .5f);
@@ -119,8 +123,6 @@ public class ClothBehavior : MonoBehaviour
                 f.p.z = Windz.value;
                 f.Update();
             }
-
-
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -142,10 +144,12 @@ public class ClothBehavior : MonoBehaviour
             //for every spring, find line renderer obj at same index
             //set position1 to particle1
             //set position2 to particle2
-            for(int i = 0; i < springdamper.Count; i++)
-            {
-                line.transform.position = springdamper[i].pOne.r;
-            }
+
+            //foreach(var sd in springdamper)
+            //{
+            //line[springdamper.IndexOf(sd)].SetPosition(0, sd.pOne.r);
+            //line[springdamper.IndexOf(sd)].SetPosition(1, sd.pTwo.r);
+            //}
         }
 
 
