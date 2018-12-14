@@ -21,7 +21,7 @@ public class ClothBehavior : MonoBehaviour
 
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         p1 = new Particle(new Vector3(0, 0, 0));
         p2 = new Particle(new Vector3(0, 1, 0));
@@ -37,16 +37,16 @@ public class ClothBehavior : MonoBehaviour
 
         for (int u = 0; u < particleList.Count; u++)
         {
-            if (particleList[u].r.y == height - 1)
-            {
-                particleList[u].anchor = true;
-            }
-
             //if (particleList[u].r.y == height - 1)
             //{
-            //    particleList[height * (width - 1)].anchor = true;
-            //    particleList[(height * width) - 1].anchor = true;
+            //    particleList[u].anchor = true;
             //}
+
+            if (particleList[u].r.y == height - 1)
+            {
+                particleList[height * (width - 1)].anchor = true;
+                particleList[(height * width) - 1].anchor = true;
+            }
         }
 
         for (int i = 0; i < particleList.Count; i++)
@@ -59,11 +59,11 @@ public class ClothBehavior : MonoBehaviour
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i + width]));
             }
-            if(particleList[i].r.x < width - 1 && particleList[i].r.y < height - 1)
+            if (particleList[i].r.x < width - 1 && particleList[i].r.y < height - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i + 1 + height]));
             }
-            if(particleList[i].r.x > 0 && particleList[i].r.y != height - 1)
+            if (particleList[i].r.x > 0 && particleList[i].r.y != height - 1)
             {
                 springdamper.Add(new SpringDamper(particleList[i], particleList[i - 1 + width]));
             }
@@ -79,78 +79,90 @@ public class ClothBehavior : MonoBehaviour
         }
     }
 
-    Vector3 worldMouse;
+        Vector3 worldMouse;
 
-	// Update is called once per frame
-	void Update ()
-    {
-        Vector3 mousePos = Input.mousePosition;        
-        worldMouse = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x,
-               mousePos.y, -Camera.main.transform.position.z));
-        foreach (var s in springdamper)
+        // Update is called once per frame
+        void Update()
         {
-            s.Ks = SpringConstant.value;
-            s.Kd = SpringDamper.value;
-            s.Update();
-        }
-        foreach (var p in particleList)
-        {
-            if(!p.anchor)
+            Vector3 mousePos = Input.mousePosition;
+            worldMouse = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x,
+                   mousePos.y, -Camera.main.transform.position.z));
+            foreach (var s in springdamper)
             {
-                p.AddForce(new Vector3(0, -9.81f, 0));
-                p.Update();
-                //if (Input.GetMouseButtonDown(1))
-                //{
-                //    if (Input.mousePosition == p.r)
-                //    {
-                //        p.r = Input.mousePosition;
-                //    }
-                //}
+                s.Ks = SpringConstant.value;
+                s.Kd = SpringDamper.value;
+                s.Update();
             }
-        }
-        foreach(var f in forces)
-        {
-            f.p = new Vector3(5, 0, .5f);
-            f.p.x = Windx.value;
-            f.p.y = Windy.value;
-            f.p.z = Windz.value;
-            f.Update();
-        }
-
-        
-        float x = 1f;
-        if(Input.GetMouseButtonDown(0))
-        {
-            foreach (var l in particleList)
+            foreach (var p in particleList)
             {
-                if (Vector3.Distance(worldMouse, l.r) < x)
+                if (!p.anchor)
                 {
-                    GrabbedPart = l;
+                    p.AddForce(new Vector3(0, -9.81f, 0));
+                    p.Update();
                 }
             }
+            foreach (var f in forces)
+            {
+                f.p = new Vector3(5, 0, .5f);
+                f.p.x = Windx.value;
+                f.p.y = Windy.value;
+                f.p.z = Windz.value;
+                f.Update();
+            }
+
+
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                float x = 1f;
+                foreach (var l in particleList)
+                {
+                    if (Vector3.Distance(worldMouse, l.r) < x)
+                    {
+                        GrabbedPart = l;
+                    }
+                }
+            }
+
+            if (GrabbedPart != null && Input.GetMouseButton(0))
+            {
+                GrabbedPart.r = worldMouse;
+            }
         }
 
-        if(GrabbedPart != null && Input.GetMouseButton(0))
-        {
-            GrabbedPart.r = worldMouse;
-        }
-    }
 
-    void OnDrawGizmos()
-    {
-        foreach (var s in springdamper)
+        void OnDrawGizmos()
         {
-            Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
+            foreach (var s in springdamper)
+            {
+                Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
+            }
+            foreach (var p in particleList)
+            {
+                Gizmos.DrawSphere(p.r, .12f);
+            }
+            foreach (var a in forces)
+            {
+                Gizmos.DrawLine(a.r1.r, a.r2.r);
+                Gizmos.DrawLine(a.r2.r, a.r3.r);
+                Gizmos.DrawLine(a.r3.r, a.r1.r);
+            }
         }
-        foreach (var p in particleList)
-        {
-            Gizmos.DrawSphere(p.r, .12f);
-        }
-        foreach (var a in forces)
-        {
-            Gizmos.DrawLine(a.r1.r, a.r2.r);
-            Gizmos.DrawLine(a.r2.r, a.r3.r);
-            Gizmos.DrawLine(a.r3.r, a.r1.r);
-        }
-    }
+
+        //void DrawLine(Vector3 start, Vector3 end, Color color)
+        //{
+        //    foreach (var sd in springdamper)
+        //    {
+
+        //        GameObject myLine = new GameObject();
+        //        myLine.transform.position = start;
+        //        myLine.AddComponent<LineRenderer>();
+        //        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        //        lr.material(color, color);
+        //        lr.SetWidth(.3f, .3f);
+        //        lr.SetPosition(0, sd.pOne.r);
+        //        lr.SetPosition(1, sd.pTwo.r);
+        //    }
+
+        //}
 }

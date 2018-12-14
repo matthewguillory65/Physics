@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+  - enabled: 0
+    path: Assets/Boids/Scenes/Boids.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/SpringDamper/Scenes/Springs.unity
+    guid: 63bbce2db1d8cd84d8cad36eab72c40c
   m_configObjects: {}

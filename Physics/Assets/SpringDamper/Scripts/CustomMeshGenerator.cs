@@ -6,8 +6,12 @@ public class CustomMeshGenerator : MonoBehaviour
 {
     List<Vector3> Vertices = new List<Vector3>();
     List<int> TrianglePoints = new List<int>();
+    List<SpringDamper> springdamper = new List<SpringDamper>();
+    List<Particle> part = new List<Particle>();
     List<Vector3> SurfaceNormals = new List<Vector3>();
     List<Vector2> UVs = new List<Vector2>();
+    int height = 7;
+    int width = 7;
 
     public MeshFilter InstanceMeshFilter;
     public Mesh InstanceMesh;
@@ -18,9 +22,9 @@ public class CustomMeshGenerator : MonoBehaviour
         InstanceMesh = new Mesh();
         InstanceMesh.name = "Mesh";
 
-        for (int x = 0; x < 5; x++)
+        for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < 5; y++)
+            for (int y = 0; y < height; y++)
             {
                 Vertices.Add(new Vector3(x, y, 0));
             }
