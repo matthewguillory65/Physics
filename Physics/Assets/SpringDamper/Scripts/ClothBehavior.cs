@@ -12,9 +12,11 @@ public class ClothBehavior : MonoBehaviour
     public Slider SpringConstant, SpringDamper, Windx, Windy, Windz;
     Particle p1, p2;
     Particle particle;
+    public GameObject myLine;
     public List<Particle> particleList = new List<Particle>();
     public List<SpringDamper> springdamper = new List<SpringDamper>();
     public List<AerodynamicForce> forces = new List<AerodynamicForce>();
+    public List<LineRenderer> line = new List<LineRenderer>();
     int height = 7;
     int width = 7;
     public Particle GrabbedPart;
@@ -23,6 +25,7 @@ public class ClothBehavior : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
         p1 = new Particle(new Vector3(0, 0, 0));
         p2 = new Particle(new Vector3(0, 1, 0));
         SD = new SpringDamper(p1, p2);
@@ -77,6 +80,13 @@ public class ClothBehavior : MonoBehaviour
                 forces.Add(new AerodynamicForce(particleList[i + 1], particleList[i + width], particleList[i + width + 1]));
             }
         }
+
+        //for every spring, Instantiate a new obj w/ line renderer component
+        foreach(var s in springdamper)
+        {            
+            var l = GameObject.Instantiate(myLine);
+            line.Add(l);
+        }
     }
 
         Vector3 worldMouse;
@@ -128,41 +138,52 @@ public class ClothBehavior : MonoBehaviour
             {
                 GrabbedPart.r = worldMouse;
             }
-        }
 
-
-        void OnDrawGizmos()
-        {
-            foreach (var s in springdamper)
+            //for every spring, find line renderer obj at same index
+            //set position1 to particle1
+            //set position2 to particle2
+            for(int i = 0; i < springdamper.Count; i++)
             {
-                Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
-            }
-            foreach (var p in particleList)
-            {
-                Gizmos.DrawSphere(p.r, .12f);
-            }
-            foreach (var a in forces)
-            {
-                Gizmos.DrawLine(a.r1.r, a.r2.r);
-                Gizmos.DrawLine(a.r2.r, a.r3.r);
-                Gizmos.DrawLine(a.r3.r, a.r1.r);
+                line.transform.position = springdamper[i].pOne.r;
             }
         }
 
-        //void DrawLine(Vector3 start, Vector3 end, Color color)
+
+        //void OnDrawGizmos()
         //{
-        //    foreach (var sd in springdamper)
+        //    foreach (var s in springdamper)
         //    {
-
-        //        GameObject myLine = new GameObject();
-        //        myLine.transform.position = start;
-        //        myLine.AddComponent<LineRenderer>();
-        //        LineRenderer lr = myLine.GetComponent<LineRenderer>();
-        //        lr.material(color, color);
-        //        lr.SetWidth(.3f, .3f);
-        //        lr.SetPosition(0, sd.pOne.r);
-        //        lr.SetPosition(1, sd.pTwo.r);
+        //        Gizmos.DrawLine(s.pOne.r, s.pTwo.r);
         //    }
-
+        //    foreach (var p in particleList)
+        //    {
+        //        Gizmos.DrawSphere(p.r, .12f);
+        //    }
+        //    foreach (var a in forces)
+        //    {
+        //        Gizmos.DrawLine(a.r1.r, a.r2.r);
+        //        Gizmos.DrawLine(a.r2.r, a.r3.r);
+        //        Gizmos.DrawLine(a.r3.r, a.r1.r);
+        //    }
         //}
+
+    //void DrawLine(Vector3 start, Vector3 end, Color color)
+    //{
+    //    foreach (var l in line)
+    //    {
+    //        foreach(var sd in springdamper)
+    //        {
+    //            myLine.transform.position = start;
+    //            myLine.AddComponent<LineRenderer>();
+    //            LineRenderer lr = myLine.GetComponent<LineRenderer>();
+    //            GameObject.Instantiate(myLine);
+    //            line.Add(myLine);
+    //            l.SetWidth(.3f, .3f);
+    //            l.SetPosition(0, sd.pOne.r);
+    //            l.SetPosition(1, sd.pTwo.r);
+    //        }
+            
+    //    }
+
+    //}
 }
